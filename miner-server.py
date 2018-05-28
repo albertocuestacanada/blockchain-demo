@@ -1,6 +1,5 @@
 from flask import Flask
 import blockchain
-import json
 import os
 import socket
 
@@ -12,10 +11,28 @@ blockchain_ = blockchain.Blockchain(block, zeros=1)
 miner.set_blockchain(blockchain_)
 
 
-@app.route("/miner/api/v0.1/blockchain/last-block")
+@app.route("/miner/api/v0.1/blockchain", methods=['GET'])
+def get_blockchain():
+
+    return miner.blockchain.json()
+
+
+@app.route("/miner/api/v0.1/blockchain/first-block", methods=['GET'])
+def get_first_block():
+
+    return miner.blockchain.first.json()
+
+
+@app.route("/miner/api/v0.1/blockchain/last-block", methods=['GET'])
 def get_last_block():
 
-    return miner.blockchain.blocks[miner.blockchain.last].json()
+    return miner.blockchain.last.json()
+
+
+@app.route("/miner/api/v0.1/blockchain/block/<string:signature>", methods=['GET'])
+def get_block():
+
+    return miner.blockchain.blocks[signature].json()
 
 
 @app.route("/")

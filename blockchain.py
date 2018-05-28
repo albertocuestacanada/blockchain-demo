@@ -70,17 +70,18 @@ class Blockchain:
                 'The block passed as first points to other block'
             )
         self.blocks = {block.signature: block}
-        self.first = block.signature
-        self.last = block.signature
+        self.first = block
+        self.last = block
         self.zeros = zeros
 
-    # Returns the first block in the blockchain
-    def get_first_block(self):
-        return self.blocks[self.first]
-
-    # Returns the last block in the blockchain
-    def get_last_block(self):
-        return self.blocks[self.last]
+    # Return a json representation of the blockchain
+    def json(self):
+        return json.dumps({
+            "First": self.first.signature,
+            "Last": self.last.signature,
+            "Zeros": str(self.zeros),
+            "Blocks": [block.json() for block in self.blocks.values()]
+        })
 
     # Appends a valid block to the blockchain
     def append(self, block):
@@ -88,7 +89,7 @@ class Blockchain:
             raise TypeError(
                 'The object passed for appending was not a block'
             )
-        if block.previous != self.last:
+        if block.previous != self.last.signature:
             raise ValueError(
                 'The block passed for appending does not point to the last'
                 ' block in the blockchain'
@@ -100,7 +101,7 @@ class Blockchain:
             raise ValueError
 
         self.blocks[block.signature] = block
-        self.last = block.signature
+        self.last = block
 
 
 '''A Miner keeps a blockchain and tries to build more blocks by choosing a set
@@ -141,7 +142,7 @@ class Miner:
             )
         if block.nonce is not 0:
             raise ValueError(
-                'The nonce for the block is not empty'
+                'The nonce for the block is not zero'
             )
         if block.signature is not "":
             raise ValueError(
@@ -158,7 +159,7 @@ class Miner:
             warnings.warn('This miner does not have a blockchain - '
                           'Creating the first block for one')
         else:
-            block.previous = self.blockchain.get_last_block().signature
+            block.previous = self.blockchain.last.signature
 
         while True:                   # Might want to implement a safety limit
             block.sign()

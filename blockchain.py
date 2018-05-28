@@ -7,6 +7,7 @@ __author__ = "Alberto Cuesta Canada"
 
 import hashlib
 import warnings
+import json
 
 '''One Block in a Blockchain.'''
 
@@ -25,10 +26,19 @@ class Block:
     def __str__(self):
         return "" \
                + "Nonce: " + str(self.nonce) + "\n" \
-               + "Mined by: " + self.miner + "\n" \
+               + "Miner: " + self.miner + "\n" \
                + "Previous block:\n" + self.previous + "\n" \
                + "Signature:\n" + self.signature
 #               + self.transactions \
+
+    # Return a json representation of the block
+    def json(self):
+        return json.dumps({
+            "Nonce": str(self.nonce),
+            "Miner": self.miner,
+            "Previous": self.previous,
+            "Signature": self.signature
+        })
 
     # Set the signature of the block into the sha256 digest of its string
     # representation.

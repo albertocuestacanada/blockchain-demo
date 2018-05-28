@@ -60,7 +60,7 @@ signatures, and pointers to the first and last blocks.
 class Blockchain:
 
     # A blockchain is initialized with an initial block
-    def __init__(self, block, zeros):
+    def __init__(self, block, zeros=1):
         if not isinstance(block, Block):
             raise TypeError(
                 'The object passed as first block was not a block'
@@ -73,7 +73,6 @@ class Blockchain:
         self.first = block.signature
         self.last = block.signature
         self.zeros = zeros
-
 
     # Returns the first block in the blockchain
     def get_first_block(self):
@@ -104,18 +103,18 @@ class Blockchain:
         self.last = block.signature
 
 
-'''A Miner tries to build blocks by choosing a set of transactions and finding
-a nonce that results in a sha256 signature for the block with the number of
-leading zeros stipulated by the blockchain
+'''A Miner keeps a blockchain and tries to build more blocks by choosing a set
+of transactions and finding a nonce that results in a sha256 signature for the
+block with the number of leading zeros stipulated by the blockchain
 '''
 
 
 class Miner:
 
-    # A miner must be initialized with a name and optionally a blockchain
-    def __init__(self, name, blockchain=None):
+    # A miner must be initialized with a name
+    def __init__(self, name):
         self.name = name
-        self.blockchain = blockchain
+        self.blockchain = None
         return
 
     # Set the blockchain for this miner

@@ -30,7 +30,7 @@ def get_last_block():
 
 
 @app.route("/miner/api/v0.1/blockchain/block/<string:signature>", methods=['GET'])
-def get_block():
+def get_block(signature):
 
     return miner.blockchain.blocks[signature].json()
 

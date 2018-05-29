@@ -41,14 +41,14 @@ GET             http://[hostname]/miner/api/v0.1/blockchain/block/[signature]
                 blockchain
 
 GET             http://[hostname]/miner/api/v0.1/blockchain/tail/[signature]
-                Retrieves the miner's blockchain from the block with a certain
+(ToDo)          Retrieves the miner's blockchain from the block with a certain
                 signature
 
 POST            http://[hostname]/miner/api/v0.1/transaction
-                Uploads a candidate transaction
+(ToDo)          Uploads a candidate transaction
 
 POST            http://[hostname]/miner/api/v0.1/blockchain/block
-                Uploads a new signed block to add to the miner's blockchain
+(ToDo)          Uploads a new signed block to add to the miner's blockchain
 
 
 

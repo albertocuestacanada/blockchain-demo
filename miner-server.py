@@ -16,6 +16,14 @@ def not_found(error):
     return flask.make_response(flask.jsonify({'error': 'Not found'}), 404)
 
 
+# How do I filter the massive error message to show something meaningful?
+# For example, 500 is returned if attempting to append a block that doesn't
+#  point to the last one in the miner's blockchain, quite a common event.
+#@app.errorhandler(500)
+#def not_found(error):
+#    return flask.make_response(flask.jsonify({'error': 'Not found'}), 500)
+
+
 @app.route("/miner/api/v0.1/blockchain", methods=['GET'])
 def get_blockchain():
 

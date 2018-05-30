@@ -34,10 +34,10 @@ class Block:
     # Return a json representation of the block
     def json(self):
         return json.dumps({
-            "Nonce": str(self.nonce),
-            "Miner": self.miner,
-            "Previous": self.previous,
-            "Signature": self.signature
+            "nonce": str(self.nonce),
+            "miner": self.miner,
+            "previous": self.previous,
+            "signature": self.signature
         })
 
     # Set the signature of the block into the sha256 digest of its string
@@ -77,10 +77,10 @@ class Blockchain:
     # Return a json representation of the blockchain
     def json(self):
         return json.dumps({
-            "First": self.first.signature,
-            "Last": self.last.signature,
-            "Zeros": str(self.zeros),
-            "Blocks": [block.json() for block in self.blocks.values()]
+            "first": self.first.signature,
+            "last": self.last.signature,
+            "zeros": str(self.zeros),
+            "blocks": [block.json() for block in self.blocks.values()]
         })
 
     # Appends a valid block to the blockchain
@@ -95,10 +95,12 @@ class Blockchain:
                 ' block in the blockchain'
             )
 
-        # Check the signature of the block has enough leading zeros
+        # Recalculate the signature of the block and check for leading zeros
         block.sign()
         if int(block.signature[:self.zeros]) != 0:
-            raise ValueError
+            raise ValueError(
+                'The block does not have enough leading zeros in the signature'
+            )
 
         self.blocks[block.signature] = block
         self.last = block

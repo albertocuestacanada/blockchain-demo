@@ -41,14 +41,47 @@ GET             http://[hostname]/miner/api/v0.1/blockchain/block/[signature]
                 blockchain
 
 GET             http://[hostname]/miner/api/v0.1/blockchain/tail/[signature]
-(ToDo)          Retrieves the miner's blockchain from the block with a certain
+                Retrieves the miner's blockchain from the block with a certain
                 signature
+
+POST            http://[hostname]/miner/api/v0.1/blockchain/block
+                Uploads a new signed block to add to the miner's blockchain
 
 POST            http://[hostname]/miner/api/v0.1/transaction
 (ToDo)          Uploads a candidate transaction
 
-POST            http://[hostname]/miner/api/v0.1/blockchain/block
-(ToDo)          Uploads a new signed block to add to the miner's blockchain
+--- Testing POST block ---
+In python3:
+import blockchain
+miner = blockchain.Miner(os.getenv('Alberto'))
+block = blockchain.Block()
+miner.sign_block(block)
+blockchain_ = blockchain.Blockchain(block, zeros=1)
+miner.set_blockchain(blockchain_)
+block = blockchain.Block()
+miner.sign_block(block)
+miner.blockchain.append(block)
+block.json()  <- This gives the json for the curl command below
 
+Execute:
+curl -i -H "Content-Type: application/json" -X POST -d '{"signature": "0e6fc956c6203586d05afd7cd9a8c9513c4450116d0742b54eff4074b319b38f", "previous": "09e17d31ffc28f4717907bf5d3ff8d7ac02e8cf08e6ee09557b8e872ff489364", "miner": "Alberto", "nonce": "14"}' http://localhost:80/miner/api/v0.1/blockchain/block
 
+Return must be:
+HTTP/1.0 201 CREATED
+Content-Type: text/html; charset=utf-8
+Content-Length: 131
+Server: Werkzeug/0.14.1 Python/3.5.5
+Date: Wed, 30 May 2018 13:27:33 GMT
 
+{"miner": "Alberto", "previous": "", "nonce": "2", "signature": "09e17d31ffc28f4717907bf5d3ff8d7ac02e8cf08e6ee09557b8e872ff489364"}
+
+Test also the blockchain:
+curl -i -H "Content-Type: application/json" -X GET http://localhost:80/miner/api/v0.1/blockchain
+
+HTTP/1.0 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 546
+Server: Werkzeug/0.14.1 Python/3.5.5
+Date: Wed, 30 May 2018 13:31:11 GMT
+
+{"last": "0e6fc956c6203586d05afd7cd9a8c9513c4450116d0742b54eff4074b319b38f", "first": "09e17d31ffc28f4717907bf5d3ff8d7ac02e8cf08e6ee09557b8e872ff489364", "zeros": "1", "blocks": ["{\"miner\": \"Alberto\", \"previous\": \"\", \"nonce\": \"2\", \"signature\": \"09e17d31ffc28f4717907bf5d3ff8d7ac02e8cf08e6ee09557b8e872ff489364\"}", "{\"miner\": \"Alberto\", \"previous\": \"09e17d31ffc28f4717907bf5d3ff8d7ac02e8cf08e6ee09557b8e872ff489364\", \"nonce\": \"14\", \"signature\": \"0e6fc956c6203586d05afd7cd9a8c9513c4450116d0742b54eff4074b319b38f\"}"]}

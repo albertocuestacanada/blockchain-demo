@@ -53,18 +53,22 @@ POST            http://[hostname]/miner/api/v0.1/transaction
 --- Testing POST block ---
 In python3:
 import blockchain
-miner = blockchain.Miner(os.getenv('Alberto'))
+import requests
+import json
+request = requests.get('http://localhost/miner/api/v0.1/blockchain/last-block')
+miner = blockchain.Miner('Miner')
 block = blockchain.Block()
-miner.sign_block(block)
+block.from_json(request.json())
 blockchain_ = blockchain.Blockchain(block, zeros=1)
 miner.set_blockchain(blockchain_)
-block = blockchain.Block()
+block = blockchain.Block(previous=miner.blockchain.last)
 miner.sign_block(block)
 miner.blockchain.append(block)
-block.json()  <- This gives the json for the curl command below
+block.to_json()
+# Haven't got yet requests.post() to work
 
 Execute:
-curl -i -H "Content-Type: application/json" -X POST -d '{"signature": "0e6fc956c6203586d05afd7cd9a8c9513c4450116d0742b54eff4074b319b38f", "previous": "09e17d31ffc28f4717907bf5d3ff8d7ac02e8cf08e6ee09557b8e872ff489364", "miner": "Alberto", "nonce": "14"}' http://localhost:80/miner/api/v0.1/blockchain/block
+curl -i -H "Content-Type: application/json" -X POST -d [Output from last command] http://localhost:80/miner/api/v0.1/blockchain/block
 
 Return must be:
 HTTP/1.0 201 CREATED
@@ -73,7 +77,7 @@ Content-Length: 131
 Server: Werkzeug/0.14.1 Python/3.5.5
 Date: Wed, 30 May 2018 13:27:33 GMT
 
-{"miner": "Alberto", "previous": "", "nonce": "2", "signature": "09e17d31ffc28f4717907bf5d3ff8d7ac02e8cf08e6ee09557b8e872ff489364"}
+[Output from block.to_json()]
 
 Test also the blockchain:
 curl -i -H "Content-Type: application/json" -X GET http://localhost:80/miner/api/v0.1/blockchain

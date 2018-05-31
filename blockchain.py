@@ -47,13 +47,21 @@ class Block:
 #               + self.transactions \
 
     # Return a json representation of the block
-    def json(self):
+    def to_json(self):
         return json.dumps({
             'nonce': self.nonce,
             'timestamp': self.timestamp,
             'previous': self.previous,
             'signature': self.signature
         })
+
+    # Overwrite the block internals with those of a json dictionary
+    def from_json(self, json):
+
+        self.nonce = json['nonce']
+        self.timestamp = json['timestamp']
+        self.previous = json['previous']
+        self.signature = json['signature']
 
     # Hiding the internal implementation of block nonce variable
     def set_nonce(self, nonce):
@@ -106,12 +114,12 @@ class Blockchain:
         self.zeros = zeros
 
     # Return a json representation of the blockchain
-    def json(self):
+    def to_json(self):
         return json.dumps({
             "first": self.first.signature,
             "last": self.last.signature,
             "zeros": str(self.zeros),
-            "blocks": [block.json() for block in self.blocks.values()]
+            "blocks": [block.to_json() for block in self.blocks.values()]
         })
 
     # Appends a valid block to the blockchain

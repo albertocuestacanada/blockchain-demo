@@ -27,7 +27,7 @@ class BlockTests(unittest.TestCase):
                       "signature:\n"
         self.assertEqual(block_print, block.__str__())
 
-    def test_empty_block_json(self):
+    def test_empty_block_to_json(self):
         block = Block()
         timestamp = str(int(time.time()))
         block.timestamp = timestamp
@@ -35,9 +35,12 @@ class BlockTests(unittest.TestCase):
                          "timestamp": timestamp,
                          "signature": "",
                          "nonce": ""}
-        self.assertDictEqual(block_as_dict, json.loads(block.json()))
+        self.assertDictEqual(
+            block_as_dict,
+            json.loads(block.to_json())
+        )
 
-    def test_first_block_json(self):
+    def test_first_block_to_json(self):
         block = Block()
         miner = Miner('miner')
         miner.sign_block(block, zeros=1)
@@ -45,9 +48,12 @@ class BlockTests(unittest.TestCase):
                          "timestamp": block.timestamp,
                          "signature": block.signature,
                          "nonce": block.nonce}
-        self.assertDictEqual(block_as_dict, json.loads(block.json()))
+        self.assertDictEqual(
+            block_as_dict,
+            json.loads(block.to_json())
+        )
 
-    def test_second_block_json(self):
+    def test_second_block_to_json(self):
         block1 = Block()
         miner = Miner('miner')
         miner.sign_block(block1, zeros=1)
@@ -58,7 +64,28 @@ class BlockTests(unittest.TestCase):
                          "timestamp": block2.timestamp,
                          "signature": block2.signature,
                          "nonce": block2.nonce}
-        self.assertDictEqual(block2_as_dict, json.loads(block2.json()))
+        self.assertDictEqual(
+            block2_as_dict,
+            json.loads(block2.to_json())
+        )
+
+    def test_block_from_json(self):
+        block1 = Block()
+        miner = Miner('miner')
+        miner.sign_block(block1, zeros=1)
+        miner.set_blockchain(Blockchain(block1, zeros=1))
+        block2 = Block(previous=block1)
+        miner.sign_block(block2, zeros=1)
+        block2_as_dict = {"previous": block1.signature,
+                          "timestamp": block2.timestamp,
+                          "signature": block2.signature,
+                          "nonce": block2.nonce}
+        block3 = Block()
+        block3.from_json(block2_as_dict)
+        self.assertDictEqual(
+            json.loads(block2.to_json()),
+            json.loads(block3.to_json())
+        )
 
     def test_Blockchain(self):
         block = Block()
@@ -78,7 +105,10 @@ class BlockTests(unittest.TestCase):
                               "zeros": "1",
                               "last": block.signature,
                               "first": block.signature}
-        self.assertDictEqual(blockchain_as_dict, json.loads(blockchain.json()))
+        self.assertDictEqual(
+            blockchain_as_dict,
+            json.loads(blockchain.to_json())
+        )
 
     def test_blockchain_two_blocks_json(self):
         block1 = Block()
@@ -95,7 +125,10 @@ class BlockTests(unittest.TestCase):
                               "zeros": "1",
                               "last": block2.signature,
                               "first": block1.signature}
-        self.assertDictEqual(blockchain_as_dict, json.loads(blockchain.json()))
+        self.assertDictEqual(
+            blockchain_as_dict,
+            json.loads(blockchain.to_json())
+        )
 
 
 if __name__ == '__main__':

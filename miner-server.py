@@ -27,25 +27,25 @@ def not_found(error):
 @app.route("/miner/api/v0.1/blockchain", methods=['GET'])
 def get_blockchain():
 
-    return miner.blockchain.json()
+    return miner.blockchain.to_json()
 
 
 @app.route("/miner/api/v0.1/blockchain/first-block", methods=['GET'])
 def get_first_block():
 
-    return miner.blockchain.first.json()
+    return miner.blockchain.first.to_json()
 
 
 @app.route("/miner/api/v0.1/blockchain/last-block", methods=['GET'])
 def get_last_block():
 
-    return miner.blockchain.last.json()
+    return miner.blockchain.last.to_json()
 
 
 @app.route("/miner/api/v0.1/blockchain/block/<string:signature>", methods=['GET'])
 def get_block(signature):
 
-    return miner.blockchain.blocks[signature].json()
+    return miner.blockchain.blocks[signature].to_json()
 
 
 @app.route("/miner/api/v0.1/blockchain/block", methods=['POST'])
@@ -53,12 +53,9 @@ def post_block():
     if not flask.request.json:
         flask.abort(400)
     _block = blockchain.Block()
-    _block.set_nonce(flask.request.json.get('nonce', ""))
-    _block.set_timestamp(flask.request.json.get('timestamp', ""))
-    _block.set_previous(flask.request.json.get('previous', ""))
-    _block.set_signature(flask.request.json.get('signature', ""))
+    _block.from_json(flask.request.json)
     miner.blockchain.append(_block)
-    return block.json(), 201
+    return block.to_json(), 201
 
 
 @app.route("/")

@@ -8,48 +8,79 @@ __author__ = "Alberto Cuesta Canada"
 import hashlib
 import warnings
 import json
+import time
 
 '''One Block in a Blockchain.'''
 
 
 class Block:
 
-    # The blocks are built empty, the correctness of the block will only be
-    # verified when adding it to a blockchain.
-    def __init__(self):
-        self.nonce = 0
-        self.miner = ''
-        self.previous = ''
+    # The blocks will auto-generate a timestamp if not provided with one.
+    # The time will be checked to be no more than two hours from current local
+    # system time.
+    # If no previous is provided this would be a genesis block.
+    def __init__(self, nonce='', timestamp='', transactions=[], previous=None):
+        self.nonce = nonce
+        if timestamp != '':
+            if abs(int(timestamp) - int(time.time())) > 2*60*60:
+                raise ValueError(
+                    'The timestamp provided differs more than two hours from '
+                    'the local system time'
+                )
+            self.timestamp = timestamp
+        else:
+            self.timestamp = str(int(time.time()))
+        self.transactions = transactions
+        if previous is None:
+            self.previous = ''
+        else:
+            self.previous = previous.signature
         self.signature = ''
 
     # Return a print-friendly string representation of the block.
     def __str__(self):
-        return "" \
-               + "Nonce: " + str(self.nonce) + "\n" \
-               + "Miner: " + self.miner + "\n" \
-               + "Previous block:\n" + self.previous + "\n" \
-               + "Signature:\n" + self.signature
+        return '' \
+               + 'nonce: ' + self.nonce + '\n' \
+               + 'timestamp: ' + self.timestamp + '\n' \
+               + 'previous:\n' + self.previous + '\n' \
+               + 'signature:\n' + self.signature
 #               + self.transactions \
 
     # Return a json representation of the block
     def json(self):
         return json.dumps({
-            "nonce": str(self.nonce),
-            "miner": self.miner,
-            "previous": self.previous,
-            "signature": self.signature
+            'nonce': self.nonce,
+            'timestamp': self.timestamp,
+            'previous': self.previous,
+            'signature': self.signature
         })
+
+    # Hiding the internal implementation of block nonce variable
+    def set_nonce(self, nonce):
+        self.nonce = str(nonce)
+
+    # Hiding the internal implementation of block timestamp variable
+    def set_timestamp(self, timestamp):
+        self.timestamp = str(timestamp)
+
+    # Hiding the internal implementation of block previous variable
+    def set_previous(self, previous):
+        self.previous = str(previous)
+
+    # Hiding the internal implementation of block signature variable
+    def set_signature(self, signature):
+        self.signature = str(signature)
 
     # Set the signature of the block into the sha256 digest of its string
     # representation.
     def sign(self):
-        hash_ = hashlib.sha256()
-        flat_block = "" \
-            + str(self.nonce) \
-            + self.miner \
+        _hash = hashlib.sha256()
+        flat_block = '' \
+            + self.nonce \
+            + self.timestamp \
             + self.previous
-        hash_.update(flat_block.encode())
-        self.signature = hash_.hexdigest()
+        _hash.update(flat_block.encode())
+        self.signature = _hash.hexdigest()
 
 
 '''A Blockchain is nothing more than a dictionary of Blocks referenced by their
@@ -65,7 +96,7 @@ class Blockchain:
             raise TypeError(
                 'The object passed as first block was not a block'
             )
-        if block.previous != "":
+        if block.previous != '':
             raise ValueError(
                 'The block passed as first points to other block'
             )
@@ -130,45 +161,16 @@ class Miner:
 
     # Searches for a nonce that will make the sha256 digest for the string
     # representation of the block start with the given number of leading zeros.
-    # The block must have no nonce and no signature before operation.
-    # After signing the block will have the name of the miner as the
-    # creation, a nonce and a signature. If the signing process is cancelled
-    # the creation, nonce and signature attributes of the block must be set to
-    # None before trying to sign it again.
-    # If previous is set to None this method creates the first block of a
-    # blockchain
     def sign_block(self, block, zeros=1):
-        if not isinstance(block, Block):
-            raise TypeError(
-                'The object passed for signing was not a block'
-            )
-        if block.nonce is not 0:
-            raise ValueError(
-                'The nonce for the block is not zero'
-            )
-        if block.signature is not "":
-            raise ValueError(
-                'The signature for block is not empty'
-            )
-        if block.miner is not "":
-            raise ValueError(
-                'The miner for block is not empty'
-            )
 
-        block.nonce = 1
-        block.miner = self.name
-        if not self.blockchain:
-            warnings.warn('This miner does not have a blockchain - '
-                          'Creating the first block for one')
-        else:
-            block.previous = self.blockchain.last.signature
-
+        _nonce = 1
         while True:                   # Might want to implement a safety limit
+            block.set_nonce(_nonce)
             block.sign()
             try:
                 if int(block.signature[:zeros]) == 0:
                     break
             except ValueError:
                 pass
-            block.nonce += 1
+            _nonce += 1
         return block

@@ -53,10 +53,10 @@ def post_block():
     if not flask.request.json:
         flask.abort(400)
     _block = blockchain.Block()
-    _block.nonce = flask.request.json.get('nonce', "")
-    _block.miner = flask.request.json.get('miner', "")
-    _block.previous = flask.request.json.get('previous', "")
-    _block.signature = flask.request.json.get('signature', "")
+    _block.set_nonce(flask.request.json.get('nonce', ""))
+    _block.set_timestamp(flask.request.json.get('timestamp', ""))
+    _block.set_previous(flask.request.json.get('previous', ""))
+    _block.set_signature(flask.request.json.get('signature', ""))
     miner.blockchain.append(_block)
     return block.json(), 201
 
